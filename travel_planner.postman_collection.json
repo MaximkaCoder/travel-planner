@@ -1,0 +1,359 @@
+{
+  "info": {
+    "_postman_id": "travel-planner-api-collection",
+    "name": "Travel Planner API",
+    "description": "Complete collection for the Travel Planner API. Set {{base_url}} to http://localhost:8000 before running.\n\nWorkflow:\n1. Search artworks to find valid IDs\n2. Create a project (with or without places)\n3. Add places, update notes, mark as visited",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000", "type": "string" },
+    { "key": "project_id", "value": "1", "type": "string" },
+    { "key": "place_id", "value": "1", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/health", "host": ["{{base_url}}"], "path": ["health"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Artworks",
+      "item": [
+        {
+          "name": "Search Artworks",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/artworks/search?q=monet&page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["artworks", "search"],
+              "query": [
+                { "key": "q", "value": "monet" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Artworks (empty query)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/artworks/search?page=1&limit=5",
+              "host": ["{{base_url}}"],
+              "path": ["artworks", "search"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "5" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "Create Project (no places)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/projects/", "host": ["{{base_url}}"], "path": ["projects", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Chicago Museum Trip\",\n  \"description\": \"Exploring the Art Institute of Chicago\",\n  \"start_date\": \"2025-06-15\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Create Project (with places)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/projects/", "host": ["{{base_url}}"], "path": ["projects", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Masterpieces Tour\",\n  \"description\": \"Must-see artworks\",\n  \"start_date\": \"2025-07-01\",\n  \"places\": [\n    { \"external_id\": 27992 },\n    { \"external_id\": 111628 }\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Create Project (validation error - >10 places)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/projects/", "host": ["{{base_url}}"], "path": ["projects", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Too Many Places\",\n  \"places\": [\n    {\"external_id\": 1}, {\"external_id\": 2}, {\"external_id\": 3},\n    {\"external_id\": 4}, {\"external_id\": 5}, {\"external_id\": 6},\n    {\"external_id\": 7}, {\"external_id\": 8}, {\"external_id\": 9},\n    {\"external_id\": 10}, {\"external_id\": 11}\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "List Projects",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/projects/?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["projects", ""],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Projects (filter active)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/projects/?status=active",
+              "host": ["{{base_url}}"],
+              "path": ["projects", ""],
+              "query": [{ "key": "status", "value": "active" }]
+            }
+          }
+        },
+        {
+          "name": "List Projects (filter completed)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/projects/?status=completed",
+              "host": ["{{base_url}}"],
+              "path": ["projects", ""],
+              "query": [{ "key": "status", "value": "completed" }]
+            }
+          }
+        },
+        {
+          "name": "Get Project",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Project",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Chicago Museum Trip (Updated)\",\n  \"description\": \"Updated description\",\n  \"start_date\": \"2025-08-01\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Update Project (partial)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Renamed Project\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Delete Project (success)",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Project (blocked - has visited places)",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Places",
+      "item": [
+        {
+          "name": "Add Place to Project",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/places/",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}", "places", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"external_id\": 27992\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Add Place (not found in API)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/places/",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}", "places", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"external_id\": 999999999\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Add Place (duplicate - should return 409)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/places/",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}", "places", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"external_id\": 27992\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "List Places",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/places/",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}", "places", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Place",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/places/{{place_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}", "places", "{{place_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Place (add notes)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/places/{{place_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}", "places", "{{place_id}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"One of my favorite paintings. Must see it in person!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Update Place (mark as visited)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/places/{{place_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}", "places", "{{place_id}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"visited\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Update Place (notes + visited)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/places/{{place_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}", "places", "{{place_id}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Saw it on July 4th, absolutely stunning!\",\n  \"visited\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Update Place (clear notes)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/places/{{place_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}", "places", "{{place_id}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": null\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
